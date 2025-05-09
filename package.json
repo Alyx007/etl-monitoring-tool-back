@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "name": "etl-monitoring-tool-back",
+  "version": "1.0.0",
+  "main": "api.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alyx007/etl-monitoring-tool-back.git"
+  },
+  "author": "Aleksandra Stupiec",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Alyx007/etl-monitoring-tool-back/issues"
+  },
+  "homepage": "https://github.com/Alyx007/etl-monitoring-tool-back#readme",
+  "description": ""
+}
