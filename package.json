@@ -1,11 +1,11 @@
 {
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "pg": "^8.15.6"
   },
   "name": "etl-monitoring-tool-back",
   "version": "1.0.0",
   "main": "api.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
