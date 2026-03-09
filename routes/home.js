@@ -4,7 +4,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
-        const { rows } = await dbService.pool.query('SELECT * FROM etl_jobs ORDER BY start_time DESC');
+        const { rows } = await dbService.pool.query('SELECT * FROM etl_jobs ORDER BY created_at DESC');
         res.json(rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
