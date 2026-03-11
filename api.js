@@ -72,7 +72,7 @@ const server = app.listen(port, () => {
 let cronTask = null;
 
 async function shutdown(signal) {
-    console.log(`\n[SHUTDOWN] ${signal} received. Shutting down gracefully...`);
+    console.log(`\n[SHUTDOWN] ${signal} received. Shutting down...`);
 
     if (cronTask) {
         cronTask.stop();
@@ -94,4 +94,4 @@ async function shutdown(signal) {
 }
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGINT', () => shutdown('SIGINT'));npm 
