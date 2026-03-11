@@ -1,20 +1,20 @@
 # ETL Monitoring Tool - Backend
 
-A data engineering project that extracts cryptocurrency market data, loads it into PostgreSQL, and monitors pipeline health through a REST API.
+A data engineering project that extracts cryptocurrency market data, loads it into PostgreSQL based database, and monitors pipeline health through a REST API.
 
-## What it does
+## What it does (For now)
 
 - **Extracts** real-time crypto prices (Bitcoin, Ethereum, Solana, Cardano, Dogecoin) from the CoinGecko API
 - **Transforms** and validates the data with automated quality checks
-- **Loads** it into a PostgreSQL database on a scheduled interval (every 15 minutes)
+- **Loads** it into a PostgreSQL database on a scheduled interval (every 15 minutes) (Neon)
 - **Monitors** pipeline runs with a dashboard, alerting, and historical stats
 
 ## Tech stack
 
 - **Runtime:** Node.js + Express 5
-- **Database:** PostgreSQL (hosted on Neon)
+- **Database:** PostgreSQL (Neon)
 - **Scheduling:** node-cron
-- **Data source:** CoinGecko API (no API key required)
+- **Data source:** CoinGecko API 
 
 ## API endpoints
 
@@ -32,11 +32,11 @@ A data engineering project that extracts cryptocurrency market data, loads it in
 
 ## Database schema
 
-- `data_sources` — registry of data sources (designed for multiple sources)
-- `etl_jobs` — job definitions with cron schedules
-- `etl_runs` — individual run history (status, duration, rows processed)
-- `crypto_prices` — extracted price data linked to runs
-- `data_quality_checks` — validation results per run
+- `data_sources` - registry of data sources (designed for multiple sources)
+- `etl_jobs` - job definitions with cron schedules
+- `etl_runs` - run history (status, duration, rows processed)
+- `crypto_prices` - extracted price data linked to runs
+- `data_quality_checks` - validation results per run
 
 ## Setup
 

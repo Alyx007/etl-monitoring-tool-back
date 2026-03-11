@@ -29,23 +29,23 @@ function transform(rawData) {
 
 // LOAD
 async function load(runId, records) {
-    const query = `
-        INSERT INTO crypto_prices (run_id, coin_id, symbol, price_usd, market_cap, volume_24h, price_change_24h_pct)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
-    `;
+    if (records.length === 0) return 0;
+
+    const values = [];
+    const params = [];
+    let paramIndex = 1;
 
     for (const record of records) {
-        await pool.query(query, [
-            runId,
-            record.coin_id,
-            record.symbol,
-            record.price_usd,
-            record.market_cap,
-            record.volume_24h,
-            record.price_change_24h_pct,
-        ]);
+        values.push(`($${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++})`);
+        params.push(runId, record.coin_id, record.symbol, record.price_usd, record.market_cap, record.volume_24h, record.price_change_24h_pct);
     }
 
+    const query = `
+        INSERT INTO crypto_prices (run_id, coin_id, symbol, price_usd, market_cap, volume_24h, price_change_24h_pct)
+        VALUES ${values.join(', ')}
+    `;
+
+    await pool.query(query, params);
     return records.length;
 }
 
@@ -86,13 +86,22 @@ async function runQualityChecks(runId, records) {
 
 // RUN PIPELINE 
 async function run() {
-    const JOB_ID = 1; // Fetch Crypto Prices job
     const startTime = Date.now();
+
+    // Look up job by name instead of hardcoding ID
+    const jobResult = await pool.query(
+        `SELECT id FROM etl_jobs WHERE name = $1`,
+        ['Fetch Crypto Prices']
+    );
+    if (jobResult.rows.length === 0) {
+        throw new Error('ETL job "Fetch Crypto Prices" not found in database');
+    }
+    const jobId = jobResult.rows[0].id;
 
     // Create run record
     const { rows } = await pool.query(
         `INSERT INTO etl_runs (job_id, status) VALUES ($1, 'running') RETURNING id`,
-        [JOB_ID]
+        [jobId]
     );
     const runId = rows[0].id;
 
