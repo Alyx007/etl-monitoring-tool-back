@@ -57,14 +57,41 @@ async function runWithRetry() {
     }
 }
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Server is running on: http://localhost:${port}`);
 
     // Run crypto ETL every 15 minutes
-    cron.schedule('*/15 * * * *', async () => {
+    cronTask = cron.schedule('*/15 * * * *', async () => {
         console.log('[CRON] Starting scheduled crypto ETL...');
         await runWithRetry();
     });
 
     console.log('[CRON] Crypto ETL scheduled to run every 15 minutes');
 });
+
+let cronTask = null;
+
+async function shutdown(signal) {
+    console.log(`\n[SHUTDOWN] ${signal} received. Shutting down gracefully...`);
+
+    if (cronTask) {
+        cronTask.stop();
+        console.log('[SHUTDOWN] Cron jobs stopped');
+    }
+
+    server.close(() => {
+        console.log('[SHUTDOWN] HTTP server closed');
+    });
+
+    try {
+        await pool.end();
+        console.log('[SHUTDOWN] Database pool closed');
+    } catch (err) {
+        console.error('[SHUTDOWN] Error closing database pool:', err.message);
+    }
+
+    process.exit(0);
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));

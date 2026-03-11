@@ -3,13 +3,23 @@ const { pool } = require('../config/db');
 const cryptoPipeline = require('../etl/fetchCryptoPrices');
 const router = express.Router();
 
+const VALID_STATUSES = ['running', 'success', 'failed'];
+const COIN_ID_PATTERN = /^[a-z0-9-]+$/;
+let pipelineRunning = false;
+
 // Trigger the crypto ETL pipeline manually
 router.post('/run/crypto', async (req, res) => {
+    if (pipelineRunning) {
+        return res.status(429).json({ error: 'Pipeline is already running. Try again later.' });
+    }
+    pipelineRunning = true;
     try {
         const result = await cryptoPipeline.run();
         res.json({ message: 'Pipeline completed', ...result });
     } catch (err) {
         res.status(500).json({ error: err.message });
+    } finally {
+        pipelineRunning = false;
     }
 });
 
@@ -25,6 +35,9 @@ router.get('/runs', async (req, res) => {
         let paramIndex = 1;
 
         if (req.query.status) {
+            if (!VALID_STATUSES.includes(req.query.status)) {
+                return res.status(400).json({ error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}` });
+            }
             conditions.push(`r.status = $${paramIndex++}`);
             params.push(req.query.status);
         }
@@ -105,6 +118,9 @@ router.get('/prices', async (req, res) => {
 // price history for a specific coin
 router.get('/prices/:coinId/history', async (req, res) => {
     try {
+        if (!COIN_ID_PATTERN.test(req.params.coinId)) {
+            return res.status(400).json({ error: 'Invalid coin ID. Use lowercase letters, numbers, and hyphens only.' });
+        }
         const limit = Math.min(500, Math.max(1, parseInt(req.query.limit) || 100));
         const { rows } = await pool.query(
             `SELECT price_usd, market_cap, volume_24h, price_change_24h_pct, fetched_at
@@ -153,9 +169,13 @@ router.get('/summary', async (req, res) => {
 // quality checks for specific run
 router.get('/runs/:runId/checks', async (req, res) => {
     try {
+        const runId = parseInt(req.params.runId);
+        if (isNaN(runId) || runId < 1) {
+            return res.status(400).json({ error: 'Invalid run ID. Must be a positive integer.' });
+        }
         const { rows } = await pool.query(
             'SELECT * FROM data_quality_checks WHERE run_id = $1',
-            [req.params.runId]
+            [runId]
         );
         res.json(rows);
     } catch (err) {
