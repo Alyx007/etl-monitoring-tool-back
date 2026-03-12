@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { timeAgo } from '../lib/timeAgo';
 
 const container = {
     hidden: {},
@@ -19,7 +20,7 @@ export default function StatsCards({ runs }) {
         { label: 'Failed', value: runs.failed_runs, color: 'var(--color-error)' },
         {
             label: 'Last Run',
-            value: runs.last_run_at ? new Date(runs.last_run_at).toLocaleString() : 'Never',
+            value: timeAgo(runs.last_run_at),
             color: 'var(--color-text-secondary)',
             small: true,
         },

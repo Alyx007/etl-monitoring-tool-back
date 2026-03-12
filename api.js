@@ -94,4 +94,4 @@ async function shutdown(signal) {
 }
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT', () => shutdown('SIGINT'));npm 
+process.on('SIGINT', () => shutdown('SIGINT'));

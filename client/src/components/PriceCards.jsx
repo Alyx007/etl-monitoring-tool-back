@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { getCoinIcon, getCoinColor } from '../lib/coinIcons';
 
 const container = {
     hidden: {},
@@ -39,6 +40,7 @@ export default function PriceCards({ prices, onSelectCoin }) {
             {prices.map((coin) => {
                 const change = parseFloat(coin.price_change_24h_pct);
                 const changePositive = change >= 0;
+                const iconColor = getCoinColor(coin.coin_id);
                 return (
                     <motion.div
                         key={coin.coin_id}
@@ -47,9 +49,21 @@ export default function PriceCards({ prices, onSelectCoin }) {
                         onClick={() => onSelectCoin?.(coin.coin_id)}
                         className="glass-card p-5 cursor-pointer transition-all duration-200"
                     >
-                        <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-sm font-medium text-[var(--color-text-secondary)] capitalize">{coin.coin_id}</h3>
-                            <span className="text-xs text-[var(--color-text-muted)] uppercase font-mono">{coin.symbol}</span>
+                        <div className="flex items-center gap-2.5 mb-3">
+                            <div
+                                className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+                                style={{
+                                    background: `${iconColor}20`,
+                                    color: iconColor,
+                                    border: `1px solid ${iconColor}40`,
+                                }}
+                            >
+                                {getCoinIcon(coin.coin_id)}
+                            </div>
+                            <div className="flex flex-col min-w-0">
+                                <h3 className="text-sm font-medium text-[var(--color-text-secondary)] capitalize truncate">{coin.coin_id}</h3>
+                                <span className="text-xs text-[var(--color-text-muted)] uppercase font-mono">{coin.symbol}</span>
+                            </div>
                         </div>
                         <p className="text-xl font-semibold text-[var(--color-text-primary)] mb-2">
                             {formatPrice(coin.price_usd)}

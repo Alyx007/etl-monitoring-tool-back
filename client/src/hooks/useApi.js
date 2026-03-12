@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-export function useApi(fetcher, deps = []) {
+export function useApi(fetcher, deps = [], { pollInterval = 0 } = {}) {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -8,7 +8,7 @@ export function useApi(fetcher, deps = []) {
     fetcherRef.current = fetcher;
 
     const load = useCallback(async () => {
-        setLoading(true);
+        setLoading((prev) => prev || data === null);
         setError(null);
         try {
             const result = await fetcherRef.current();
@@ -24,6 +24,12 @@ export function useApi(fetcher, deps = []) {
     useEffect(() => {
         load();
     }, [load]);
+
+    useEffect(() => {
+        if (!pollInterval) return;
+        const id = setInterval(load, pollInterval);
+        return () => clearInterval(id);
+    }, [load, pollInterval]);
 
     return { data, loading, error, reload: load };
 }
